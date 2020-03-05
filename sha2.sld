@@ -26,34 +26,36 @@
      (define type-sha-224 0)
      (define type-sha-256 1)
 
-;    (define (process-sha-data! context src)
-;      (cond ((or (bytevector? src) (string? src))
-;             (add-sha-data! context src))
-;            ((input-port? src)
-;             (let lp ((chunk (read-bytevector 1024 src)))
-;               (unless (eof-object? chunk)
-;                 (add-sha-data! context chunk)
-;                 (lp (read-bytevector 1024 src)))))
-;            (else
-;             (error "unknown digest source: " src))))
+    (define (process-sha-data! context src)
+      (cond ((or (bytevector? src) (string? src))
+             (add-sha-data! context src))
+            ((input-port? src)
+             (let lp ((chunk (read-bytevector 1024 src)))
+               (unless (eof-object? chunk)
+                 (add-sha-data! context chunk)
+                 (lp (read-bytevector 1024 src)))))
+            (else
+             (error "unknown digest source: " src))))
     
     (define (sha-224 src)
       (let ((context (start-sha type-sha-224)))
-        ;(process-sha-data! context src)
-        ;(get-sha context)
-        'todo))
+        (process-sha-data! context src)
+        (get-sha context)))
     
     (define (sha-256 src)
       (let ((context (start-sha type-sha-256)))
-        ;(process-sha-data! context src)
-        ;(get-sha context)
-        'todo))
-
-; TODO: 
-; add-sha-data! 
-; get-sha
+        (process-sha-data! context src)
+        (get-sha context)))
 
     (define-c start-sha
       "(void *data, int argc, closure _, object k, object type)"
       " start_sha(data, k, type);")
+
+    (define-c add-sha-data!
+      "(void *data, int argc, closure _, object k, object opq, object chunk)"
+      " return_closcall1(data, k, sha_224_256_add_bytes(data, opq, chunk));")
+
+    (define-c get-sha
+      "(void *data, int argc, closure _, object k, object opq)"
+      " get_sha(data, k, opq);")
 ))

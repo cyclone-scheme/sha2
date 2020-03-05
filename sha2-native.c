@@ -148,32 +148,52 @@ static void start_sha (void *data, object cont, object type_arg) {
 }
 
 /* = Processing incoming data ======================================= */
-// 
-// static sexp sha_224_256_add_bytes (struct sha_context *sha,
-//                                    const sexp_uint8_t *src, sexp_uint_t len) {
-//   sexp_uint_t src_offset, buf_offset;
-//   /* Realign (src + src_offset) to 64 bytes */
-//   src_offset = 0;
-//   buf_offset = sha->len % 64;
-//   sha->len += len;
-//   if (buf_offset) {
-//     while ((buf_offset < 64) && (src_offset < len))
-//       sha->buffer[buf_offset++] = src[src_offset++];
-//     if (buf_offset == 64)
-//       sha_224_256_round(sha->buffer, sha->hash256);
-//     else
-//       return SEXP_VOID;
-//   }
-//   /* Process whole chunks without copying them */
-//   if (len >= 64) {
-//     for ( ; src_offset <= (len - 64); src_offset += 64)
-//       sha_224_256_round(src + src_offset, sha->hash256);
-//   }
-//   /* Copy the remainder into the buffer */
-//   if (src_offset < len)
-//     memcpy(sha->buffer + buf_offset, src + src_offset, len - src_offset);
-//   return SEXP_VOID;
-// }
+
+static object sha_224_256_add_bytes (void *data, object opq, //struct sha_context *sha,
+                                     object chunk) { //const sexp_uint8_t *src, sexp_uint_t len) {
+  Cyc_check_opaque(data, opq);
+  Cyc_check_obj(data, string_tag, chunk);
+
+  struct sha_context *sha = opaque_ptr(opq);
+  const uint8_t *src = NULL;
+  int len = 0;
+
+  if (type_of(chunk) == string_tag) {
+    src = (uint8_t *)string_str(chunk);
+    len = string_len(chunk);
+  } else if (type_of(chunk) == bytevector_tag) {
+    bytevector_type *bv = chunk;
+    src = (uint8_t *)bv->data;
+    len = bv->len;
+  } else {
+    Cyc_rt_raise2(data, "Unhandled type for adding SHA data", chunk);
+  }
+
+  
+
+  uint32_t src_offset, buf_offset;
+  /* Realign (src + src_offset) to 64 bytes */
+  src_offset = 0;
+  buf_offset = sha->len % 64;
+  sha->len += len;
+  if (buf_offset) {
+    while ((buf_offset < 64) && (src_offset < len))
+      sha->buffer[buf_offset++] = src[src_offset++];
+    if (buf_offset == 64)
+      sha_224_256_round(sha->buffer, sha->hash256);
+    else
+      return boolean_t;
+  }
+  /* Process whole chunks without copying them */
+  if (len >= 64) {
+    for ( ; src_offset <= (len - 64); src_offset += 64)
+      sha_224_256_round(src + src_offset, sha->hash256);
+  }
+  /* Copy the remainder into the buffer */
+  if (src_offset < len)
+    memcpy(sha->buffer + buf_offset, src + src_offset, len - src_offset);
+  return boolean_t;
+}
 // 
 // static sexp sha_add_bytes (sexp ctx, sexp self, struct sha_context *sha,
 //                            const char* data, sexp_uint_t len) {
@@ -196,51 +216,55 @@ static void start_sha (void *data, object cont, object type_arg) {
 //     return sha_add_bytes(ctx, self, sha, sexp_string_data(data), sexp_string_size(data));
 //   return sexp_xtype_exception(ctx, self, "data type not supported", data);
 // }
-// 
-// /* = Extracting computed digest ===================================== */
-// 
-// static const char *hex = "0123456789abcdef";
-// 
-// static sexp sha_224_256_hash_string (sexp ctx, sexp self,
-//                                      const sexp_uint32_t hash[8], int count) {
-//   sexp res;
-//   int i, j;
-//   sexp_uint32_t next_word;
-//   /* Allocate a string of target length */
-//   res = sexp_make_string(ctx, sexp_make_fixnum(count * 8), SEXP_VOID);
-//   if (sexp_exceptionp(res))
-//     return res;
-//   /* Write 32-bit words as nibbles in big-endian order */
-//   for (i = 0; i < count; i++) {
-//     next_word = hash[i];
-//     for (j = 7; j >= 0; j--) {
-//       sexp_string_data(res)[8*i + j] = hex[next_word & 0xF];
-//       next_word >>= 4;
-//     }
-//   }
-//   return res;
-// }
-// 
-// sexp sexp_get_sha (sexp ctx, sexp self, struct sha_context *sha) {
-//   if (!sha->sealed) {
-//     sha->sealed = 1;
-//     switch (sha->type) {
-//     case SHA_TYPE_224:
-//     case SHA_TYPE_256:
-//       sha_224_256_remainder(sha->buffer, sha->len % 64,
-//                             sha->len * 8, sha->hash256);
-//       break;
-//     default:
-//       break;
-//     }
-//   }
-//   switch (sha->type) {
-//   case SHA_TYPE_224:
-//     return sha_224_256_hash_string(ctx, self, sha->hash256, 7);
-//   case SHA_TYPE_256:
-//     return sha_224_256_hash_string(ctx, self, sha->hash256, 8);
-//   default:
-//     return sexp_xtype_exception(ctx, self, "unexpected context type",
-//                                 sexp_make_fixnum(sha->type));
-//   }
-// }
+
+/* = Extracting computed digest ===================================== */
+
+static const char *hex = "0123456789abcdef";
+
+static void sha_224_256_hash_string (void *data, object k,
+                                     const uint32_t hash[8], int count) {
+  int i, j;
+  uint32_t next_word;
+  /* Allocate a string of target length */
+  //res = sexp_make_string(ctx, sexp_make_fixnum(count * 8), SEXP_VOID);
+  //if (sexp_exceptionp(res))
+  //  return res;
+  char *buf = alloca(count * 8);
+
+  /* Write 32-bit words as nibbles in big-endian order */
+  for (i = 0; i < count; i++) {
+    next_word = hash[i];
+    for (j = 7; j >= 0; j--) {
+      buf[8*i + j] = hex[next_word & 0xF];
+      next_word >>= 4;
+    }
+  }
+  buf[count * 8] = '\0';
+  make_string(str, buf);
+  return_closcall1(data, k, &str);
+}
+
+static void get_sha (void *data, object k, object opq) {
+  Cyc_check_opaque(data, opq);
+  struct sha_context *sha = opaque_ptr(opq);
+  if (!sha->sealed) {
+    sha->sealed = 1;
+    switch (sha->type) {
+    case SHA_TYPE_224:
+    case SHA_TYPE_256:
+      sha_224_256_remainder(sha->buffer, sha->len % 64,
+                            sha->len * 8, sha->hash256);
+      break;
+    default:
+      break;
+    }
+  }
+  switch (sha->type) {
+  case SHA_TYPE_224:
+    sha_224_256_hash_string(data, k, sha->hash256, 7);
+  case SHA_TYPE_256:
+    sha_224_256_hash_string(data, k, sha->hash256, 8);
+  default:
+    Cyc_rt_raise2(data, "Unexpected SHA type", obj_int2obj(sha->type));
+  }
+}
