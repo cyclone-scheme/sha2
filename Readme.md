@@ -1,4 +1,4 @@
-Implementation of the SHA-2 (Secure Hash Algorithm) cryptographic hash. This library was ported from Chibi Scheme's `(chibi crypto sha2)` library.
+Implementation of the SHA-2 (Secure Hash Algorithm) cryptographic hash, ported from Chibi Scheme's `(chibi crypto sha2)` library.
 
 # API
 
