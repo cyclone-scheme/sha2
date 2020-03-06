@@ -76,7 +76,6 @@
   (test "47e4ee7f211f73265dd17658f6e21c1318bd6c81f37598e20a2756299542efcf"
       (sha-256 #u8(1 2 3 4 5 6 7 8 9)))
   (test "a745f3ca4f474d583c050eaf476ce76439d171ebe2b49d4af8b44f13ba71fb56"
-      (sha-256 (open-input-bytevector #u8(1 2 3 9))))
-)
+      (sha-256 (open-input-bytevector #u8(1 2 3 9)))))
 
 (test-exit)
