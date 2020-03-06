@@ -2,7 +2,7 @@
 ;;> Implementation of the SHA-2 (Secure Hash Algorithm) cryptographic
 ;;> hash.
 
-(define-library (sha2)
+(define-library (cyclone crypto sha2)
   (import (scheme base))
   (export sha-224 sha-256)
   (include-c-header "sha2-native.c")
