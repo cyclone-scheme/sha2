@@ -3,9 +3,16 @@
 
 (import (scheme base) (scheme write) (cyclone crypto sha2))
 
-(write (command-line-arguments))
-(newline)
+;(write (command-line-arguments))
+;(newline)
+;
+;(display
+;  (sha-256 (open-binary-input-file (car (command-line-arguments)))))
+;(newline)
 
-(display
-  (sha-256 (open-binary-input-file (car (command-line-arguments)))))
-(newline)
+;; Test case, is there a bug in read-bytevector?
+(let ((src (open-binary-input-file (car (command-line-arguments)))))
+             (let lp ((chunk (read-bytevector 1024 src)))
+               (unless (eof-object? chunk)
+                 (display (utf8->string chunk))
+                 (lp (read-bytevector 1024 src)))))
