@@ -1,7 +1,8 @@
+;; An example program to compute SHA256 of a file
 (import (scheme base) (scheme write) (cyclone crypto sha2))
 
 (when (null? (command-line-arguments))
-  (display "Usage: sha256sum FILE")
+  (display "Usage: sha256sum-cyc FILE")
   (newline)
   (exit 1))
 
