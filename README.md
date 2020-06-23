@@ -56,17 +56,17 @@ Computes SHA-256 digest of the src which can be a string, a bytevector, or a bin
 ```
 
 ## Author(s)
-Justin Ethier
+Alex Shinn, Alexei Lozovsky
 
 ## Maintainer(s) 
 Justin Ethier
 
 ## Version 
-0.2
+0.3
 
 ## License 
-MIT
+BSD
 
 ## Tags 
-crypto networking
+crypto networking hash
 

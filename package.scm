@@ -1,6 +1,6 @@
 (package
  (name           sha2)
- (version        0.1)
+ (version        0.3)
  (license        "BSD")
  (authors        "Alex Shinn, Alexei Lozovsky")
  (maintainers    "Justin Ethier <justin.ethier at gmail dot com>")
