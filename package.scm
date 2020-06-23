@@ -6,7 +6,7 @@
  (maintainers    "Justin Ethier <justin.ethier at gmail dot com>")
  (description    "Native implementation of SHA-2 digest algorithms")
  (tags           "crypto" "hash")
- (docs           "https://github.com/cyclone-scheme/sha2/raw/master/Readme.md")
+ (docs           "https://github.com/cyclone-scheme/cyclone-winds/wiki/sha2")
  (test           "test-sha2.scm")
 
  (program
