@@ -29,8 +29,6 @@ None
 
 ### (cyclone crypto sha2)
 
-#### [procedure]   `(curl-global-init flags)`
-
 #### [procedure]   `(sha-224 src)`
 
 Computes SHA-224 digest of the src which can be a string, a bytevector, or a binary input port. Returns a hexadecimal string (in lowercase).
