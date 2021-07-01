@@ -62,7 +62,7 @@ Alex Shinn, Alexei Lozovsky
 Justin Ethier
 
 ## Version 
-0.3
+"0.3.0"
 
 ## License 
 BSD
